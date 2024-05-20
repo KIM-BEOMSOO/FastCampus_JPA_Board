@@ -1,11 +1,15 @@
 package com.fastcampus.ch4;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Date;
 
 @SpringBootApplication
 public class Ch4Application implements CommandLineRunner {
@@ -21,6 +25,22 @@ public class Ch4Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("emf = " + emf);
+		EntityManager em = emf.createEntityManager();
+		System.out.println("em = " + em);
+		EntityTransaction tx = em.getTransaction();
+
+		User user = new User();
+		user.setId("ccc");
+		user.setPassword("4321");
+		user.setName("Lee");
+		user.setEmail("aaa@aaa.com");
+		user.setInDate(new Date());
+		user.setUpDate(new Date());
+
+		tx.begin();
+		em.persist(user);
+		user.setPassword("4444");
+		user.setEmail("QQQQ@QQQ.com");
+		tx.commit();
 	}
 }
