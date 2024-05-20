@@ -38,9 +38,22 @@ public class Ch4Application implements CommandLineRunner {
 		user.setUpDate(new Date());
 
 		tx.begin();
+		
+		// 1. 저장
 		em.persist(user);
+
+		// 2. 변경
 		user.setPassword("4444");
 		user.setEmail("QQQQ@QQQ.com");
+		tx.commit();
+
+		// 3. 조회
+		User user2 = em.find(User.class, "ccc");
+		System.out.println("user==user2 = " + (user == user2));
+
+		// 4. 삭제
+		tx.begin();
+		em.remove(user);
 		tx.commit();
 	}
 }
