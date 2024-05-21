@@ -1,13 +1,36 @@
 package com.fastcampus.ch4;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 public interface BoardRepository extends CrudRepository<Board, Long> {
 
     //쿼리메서드 작성 S
+
+    @Query(value = "SELECT title, writer FROM BOARD", nativeQuery = true)
+    //컬럼을 일부만 가져올 경우, 반환타입을 Object로 해주어야 합니다.
+    List<Object[]> findAllBoardBySQL2();
+
+    //@Query에 nativeQuery속성을 true로 주면 value는 SQL문법이 됩니다
+    //nativeQuery속성을 주지 않으면 JPQL문법이 됩니다.
+    //JPQL과 SQL문법은 조금씩 다릅니다. (필요할 경우 구글링을 하여 알아보세요)
+    @Query(value = "SELECT * FROM BOARD", nativeQuery = true)
+    List<Board> findAllBoardBySQL(); //메서드 이름은 아무거나 해도 상관 없습니다.
+
+    //아래는 JPQL문법입니다.
+    //JPQL은 대소문자를 구분합니다. => 대소문자 주의
+    //JPQL 문법이 따로 있습니다. (필요할 경우 검색하여 찾아보세요)
+    @Query("SELECT b FROM Board b")
+    List<Board> findAllBoard(); //메서드 이름은 아무거나 해도 상관 없습니다.
+
+
+    //순서로 결정하기 => @Query로 JPQL 작성 (아래 문법은 JPQL문법입니다)
+    @Query("SELECT b FROM Board b WHERE b.title=?1 AND b.writer=?2")
+    List<Board> findByTitleAndWriter2(String title, String writer); //매개변수의 순서로 결정됩니다.
 
     //SELECT COUNT(*) FROM BOARD WHERE WRITER = :writer
     //원래는 countAllBoardByWriter으로 작성해야 함

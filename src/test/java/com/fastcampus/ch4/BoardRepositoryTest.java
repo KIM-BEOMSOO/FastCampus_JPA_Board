@@ -26,8 +26,6 @@ class BoardRepositoryTest {
     @Autowired
     private BoardRepository boardRepo;
 
-
-
     // 4.BoardRepository 인터페이스를 이용한 데이터 삭제 테스트
     @Test
     @Order(4)
