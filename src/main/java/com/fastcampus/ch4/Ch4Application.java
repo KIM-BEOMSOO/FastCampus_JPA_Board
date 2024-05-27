@@ -25,35 +25,35 @@ public class Ch4Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		EntityManager em = emf.createEntityManager();
-		System.out.println("em = " + em);
-		EntityTransaction tx = em.getTransaction();
-
-		User user = new User();
-		user.setId("ccc");
-		user.setPassword("4321");
-		user.setName("Lee");
-		user.setEmail("aaa@aaa.com");
-		user.setInDate(new Date());
-		user.setUpDate(new Date());
-
-		tx.begin();
-		
-		// 1. 저장
-		em.persist(user);
-
-		// 2. 변경
-		user.setPassword("4444");
-		user.setEmail("QQQQ@QQQ.com");
-		tx.commit();
-
-		// 3. 조회
-		User user2 = em.find(User.class, "ccc");
-		System.out.println("user==user2 = " + (user == user2));
-
-		// 4. 삭제
-		tx.begin();
-		em.remove(user);
-		tx.commit();
+//		EntityManager em = emf.createEntityManager();
+//		System.out.println("em = " + em);
+//		EntityTransaction tx = em.getTransaction();
+//
+//		User user = new User();
+//		user.setId("ccc");
+//		user.setPassword("4321");
+//		user.setName("Lee");
+//		user.setEmail("aaa@aaa.com");
+//		user.setInDate(new Date());
+//		user.setUpDate(new Date());
+//
+//		tx.begin();
+//
+//		// 1. 저장
+//		em.persist(user);
+//
+//		// 2. 변경
+//		user.setPassword("4444");
+//		user.setEmail("QQQQ@QQQ.com");
+//		tx.commit();
+//
+//		// 3. 조회
+//		User user2 = em.find(User.class, "ccc");
+//		System.out.println("user==user2 = " + (user == user2));
+//
+//		// 4. 삭제
+//		tx.begin();
+//		em.remove(user);
+//		tx.commit();
 	}
 }
