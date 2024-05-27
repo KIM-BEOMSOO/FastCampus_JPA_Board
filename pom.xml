@@ -18,7 +18,7 @@
 	</properties>
 	<dependencies>
 
-<!--		querydsl S-->
+		<!--querydsl S-->
 		<dependency>
 			<groupId>com.querydsl</groupId>
 			<artifactId>querydsl-jpa</artifactId>
@@ -31,7 +31,7 @@
 			<version>5.0.0</version>
 			<classifier>jakarta</classifier>
 		</dependency>
-		<!--		querydsl E-->
+		<!--querydsl E-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

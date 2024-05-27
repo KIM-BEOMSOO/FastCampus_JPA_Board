@@ -1,5 +1,9 @@
 package com.fastcampus.ch4;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.*;
@@ -11,6 +15,9 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+//Qboard import
+import static com.fastcampus.ch4.QBoard.board;
 
 // TDD작성 시 @SpringBootTest 필수 입력
 @SpringBootTest
@@ -50,67 +57,66 @@ class BoardRepositoryTest4 {
         }
     }
 
-    //6.@Query에 navtiveQuery=true 속성 적용하여 SQL 작성하기
     @Test
-    @DisplayName("@Query로 네이티브 쿼리(SQL) 작성 테스트2 => 일부 컬럼 가져오기") //테스트 이름이 변경됩니다.
-    public void queryAnnoTest5(){
-        List<Object[]> list = boardRepo.findAllBoardBySQL2();
-//      list.forEach(System.out::println); <= 이렇게 작성하면 메모리 주소가 찍힘. => toString으로 변환해야 함
-        list.stream()
-                .map(arr-> Arrays.toString(arr)) //arr을 String으로 변환
-                .forEach(System.out::println);
-        assertTrue(list.size()==100);
-    }
+    @DisplayName("querydsl로 쿼리 작성 테스트3 - 동적 쿼리작성") //테스트 이름이 변경됩니다.
+    public void querydslTest3() {
+        String searchBy = "TC"; //제목(title)과 작성내용(content)에서 검색
+        String keyword = "1";
+        keyword = "%" + keyword + "%";
 
-    //5.@Query에 navtiveQuery=true 속성 적용하여 SQL 작성하기
-    @Test
-    @DisplayName("@Query로 네이티브 쿼리(SQL) 작성 테스트") //테스트 이름이 변경됩니다.
-    public void queryAnnoTest4(){
-        List<Board> list = boardRepo.findAllBoardBySQL();
-        assertTrue(list.size()==100);
+        BooleanBuilder builder = new BooleanBuilder();
 
-    }
+        if(searchBy.equalsIgnoreCase("T")){
+            builder.and(board.title.like(keyword));
+        }else if (searchBy.equalsIgnoreCase("C")){
+            builder.and(board.content.like(keyword));
+        }else if (searchBy.equalsIgnoreCase("TC")) {
+            builder.and(board.title.like(keyword).or(board.content.like(keyword)));
+        }
 
-    //4.@Query 사용하여 JPQL 작성하기 - 여러 조건 - 매개변수 이름
-    @Test
-    @DisplayName("@Query로 JPQL 작성 테스트 - 매개변수 이름") //테스트 이름이 변경됩니다.
-    public void queryAnnoTest3(){
-        //BoardRepository에 선언한 @Query 메서드 실행
-        //("SELECT b FROM Board b.title=:title AND b.writer=:writer")
-        List<Board> list = boardRepo.findByTitleAndWriter2("title1","writer1");
-        assertTrue(list.size()==1);
-    }
+        JPAQueryFactory qf = new JPAQueryFactory(em);
+        JPAQuery query = qf.selectFrom(board)
+                .where(builder)
+                .orderBy(board.upDate.desc());
 
-    //3.@Query 사용하여 JPQL 작성하기 - 여러 조건 - 매개변수 순서
-    @Test
-    @DisplayName("@Query로 JPQL 작성 테스트 - 매개변수 순서") //테스트 이름이 변경됩니다.
-    public void queryAnnoTest2(){
-        //BoardRepository에 선언한 @Query 메서드 실행 ("SELECT b FROM Board b.title=?1 AND b.writer=?2")
-        List<Board> list = boardRepo.findByTitleAndWriter2("title1","writer1");
+        List<Board> list = query.fetch();
         list.forEach(System.out::println);
-        assertTrue(list.size()==1);
     }
 
-    //2.@Query 사용하여 JPQL 작성하기 - 하나의 조건
     @Test
-    @DisplayName("@Query로 JPQL 작성 테스트") //테스트 이름이 변경됩니다.
-    public void queryAnnoTest(){
-        //BoardRepository에 선언한 @Query 메서드 실행 (SELECT * FROM Board)
-        List<Board> list = boardRepo.findAllBoard();
-        assertTrue(list.size()==100);
-    }
+    @DisplayName("querydsl로 쿼리 작성 테스트2 - 복잡한 쿼리작성") //테스트 이름이 변경됩니다.
+    public void querydslTest2() {
+        JPAQueryFactory qf = new JPAQueryFactory(em);
 
-    //1.createQuery 사용하여 JPQL 작성하기
-    //복잡한 쿼리를 작성할 때에 JPQL을 직접 작성하는 테스트입니다.
-    //자주 사용 안함. (@Query를 더 많이 사용합니다. => 해당 부분은 참고용(이런게 있구나~))
-    @Test
-    @DisplayName("createQuery로 JPQL 작성 테스트") //테스트 이름이 변경됩니다.
-    public void createQueryTest(){
-        String query = "SELECT b FROM Board b";
-        TypedQuery<Board> tQuery = em.createQuery(query, Board.class);
-        List<Board> list = tQuery.getResultList();
+        JPAQuery<Tuple> query = qf.select(board.writer, board.viewCnt.sum()).from(board)
+                .where(board.title.notLike("title1%"))
+                .where(board.writer.eq("writer1"))
+                .where(board.content.contains("content"))
+                .where(board.content.isNotNull())
+                .groupBy(board.writer)
+                .having(board.viewCnt.sum().gt(100)) //조회수의 종합이 100이 넘는 작성자
+                .orderBy(board.writer.asc())
+                .orderBy(board.viewCnt.sum().desc());
 
+        List<Tuple> list = query.fetch();
         list.forEach(System.out::println);
-        assertTrue(list.size()==100);
+    }
+
+    @Test
+    @DisplayName("querydsl로 쿼리 작성 테스트1 - 간단한 쿼리작성") //테스트 이름이 변경됩니다.
+    public void querydslTest() {
+
+
+//        QBoard board = QBoard.board;
+        //1.JPAQueryFactory를 생성
+        JPAQueryFactory qf = new JPAQueryFactory(em);
+
+        //2.쿼리 작성
+        JPAQuery<Board> query =qf.selectFrom(board)
+                .where(board.title.eq("title1"));
+
+        //3.쿼리 실행
+        List<Board> list = query.fetch();
+        list.forEach(System.out::println);
     }
 }
