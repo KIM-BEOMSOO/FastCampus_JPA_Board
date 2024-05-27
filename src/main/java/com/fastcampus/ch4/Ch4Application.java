@@ -19,7 +19,7 @@ public class Ch4Application implements CommandLineRunner {
 
 	public static void main(String[] args){
 		SpringApplication app = new SpringApplication(Ch4Application.class);
-		app.setWebApplicationType(WebApplicationType.NONE);
+//		app.setWebApplicationType(WebApplicationType.NONE);
 		app.run(args);
 	}
 
