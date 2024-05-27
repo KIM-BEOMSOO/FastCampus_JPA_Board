@@ -1,17 +1,18 @@
 package com.fastcampus.ch4;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="Users")
 public class User {
 
     @Id //PK로 지정
+    @Column(name = "user_id")
     private String id;
     private String password;
     private String name;
@@ -28,8 +29,24 @@ public class User {
                 ", email='" + email + '\'' +
                 ", inDate=" + inDate +
                 ", upDate=" + upDate +
+                ", list=" + list +
                 '}';
     }
+
+    public List<Board> getList() {
+        return list;
+    }
+
+    public void setList(List<Board> list) {
+        this.list = list;
+    }
+
+    // FetchType.EAGER - 두 엔티티의 정보를 같이 가져오는 것(join)
+    // FetchType.LAZY - 따로 가져오는 것. 나중에 getList() default
+//    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER) //User 하나에 여러 Board
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY) //User 하나에 여러 Board
+            List<Board> list = new ArrayList<>();
+
 
     public String getId() {
         return id;

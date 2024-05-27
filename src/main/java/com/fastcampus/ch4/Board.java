@@ -12,9 +12,12 @@ public class Board { //게시판 테이블을 위한 @Entity 생성 완료
 
     private Long bno;
     private String title;
-    private String writer;
+//    private String writer;
     private String content;
     private Long viewCnt;
+    @ManyToOne // 여러 Board에 하나의 User. FK 자동 생성
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date inDate;
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -25,12 +28,20 @@ public class Board { //게시판 테이블을 위한 @Entity 생성 완료
         return "Board{" +
                 "bno=" + bno +
                 ", title='" + title + '\'' +
-                ", writer='" + writer + '\'' +
                 ", content='" + content + '\'' +
                 ", viewCnt=" + viewCnt +
+//                ", user=" + user +
                 ", inDate=" + inDate +
                 ", upDate=" + upDate +
                 '}';
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Long getBno() {
@@ -49,13 +60,13 @@ public class Board { //게시판 테이블을 위한 @Entity 생성 완료
         this.title = title;
     }
 
-    public String getWriter() {
-        return writer;
-    }
-
-    public void setWriter(String writer) {
-        this.writer = writer;
-    }
+//    public String getWriter() {
+//        return writer;
+//    }
+//
+//    public void setWriter(String writer) {
+//        this.writer = writer;
+//    }
 
     public String getContent() {
         return content;
